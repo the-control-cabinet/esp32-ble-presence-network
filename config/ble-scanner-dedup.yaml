@@ -1,46 +1,67 @@
-# ESPHome: passive BLE scanner that de-duplicates devices on the ESP32 and publishes
-# a bounded list + count to MQTT every 10 minutes (keeps HA's recorder light).
-# Part of an existing BLE-proxy board; credentials via !secret.
+# ESPHome: BLE discovery logger (v2). De-duplicates devices ON the ESP32 and publishes
+# an accumulating, bounded list + count to MQTT every 10 minutes.
+# Part of a proxy board's YAML; credentials via !secret. Replace <board> with the topic name.
+#
+# v2 changes (Oct 2026): std::map keyed by the 64-bit address instead of a vector of strings.
+#  - an already-seen device costs one map lookup and nothing else
+#  - the entry string (type label + address + cleaned name) is built once per NEW device
+#  - when full, one entry is erased (O(log n)), instead of shifting the whole vector
+# NOTE: no // comments inside lambdas - on ESPHome 2026.10 they broke compilation
+#       ("expected '}' at end of input").
+
 mqtt:
   id: mqtt_client
   broker: !secret mqtt_broker
   username: !secret mqtt_username
   password: !secret mqtt_password
   keepalive: 60s            # 15 s caused disconnect cycling under BLE load
-
-bluetooth_proxy:
-  active: false
+  discovery: false          # the scanner topics are read by manual HA sensors; no duplicate entities
 
 globals:
   - id: seen_devices
-    type: std::vector<std::string>
-    restore_value: no
+    type: std::map<uint64_t, std::string>
+    restore_value: false
 
 esp32_ble_tracker:
   scan_parameters:
     interval: 320ms
     window: 30ms
-    active: false           # passive: listen only
+    active: true            # active scanning: scan responses carry device names
   on_ble_advertise:
     - then:
         - lambda: |-
-            std::string mac = x.address_str();
-            auto &v = id(seen_devices);
-            if (std::find(v.begin(), v.end(), mac) == v.end()) {
-              v.push_back(mac);
-              if (v.size() > 200) v.erase(v.begin());   // bounded: prevents the memory crash
+            uint64_t mac = x.address_uint64();
+            auto &m = id(seen_devices);
+            if (m.count(mac)) return;
+            if (m.size() >= 200) m.erase(m.begin());
+            std::string t;
+            switch (x.get_address_type()) {
+              case BLE_ADDR_TYPE_PUBLIC: t = "PUB"; break;
+              case BLE_ADDR_TYPE_RANDOM: t = "RAND"; break;
+              case BLE_ADDR_TYPE_RPA_PUBLIC: t = "RPA_PUB"; break;
+              case BLE_ADDR_TYPE_RPA_RANDOM: t = "RPA_RAND"; break;
+              default: t = "UNK"; break;
             }
+            std::string e = "[" + t + "]" + x.address_str();
+            for (char c : x.get_name()) {
+              if (c == '"' || c == '\\' || c < 32) continue;
+              if (e.find('|') == std::string::npos) e += "|";
+              e += c;
+            }
+            m[mac] = e;
 
 interval:
   - interval: 10min
     then:
       - lambda: |-
-          auto &v = id(seen_devices);
+          auto &m = id(seen_devices);
           std::string json = "{\"devices\":[";
-          for (size_t i = 0; i < v.size(); i++) {
-            if (i) json += ",";
-            json += "\"" + v[i] + "\"";
+          bool first = true;
+          for (auto &kv : m) {
+            if (!first) json += ",";
+            json += "\"" + kv.second + "\"";
+            first = false;
           }
-          json += "]}";                                   // dict-wrapped: HA json_attributes needs an object
+          json += "]}";
           id(mqtt_client).publish("ble_scanner/<board>/all_devices", json, 0, false);
-          id(mqtt_client).publish("ble_scanner/<board>/count", to_string(v.size()), 0, false);
+          id(mqtt_client).publish("ble_scanner/<board>/count", to_string(m.size()), 0, false);

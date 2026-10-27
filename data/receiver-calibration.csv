@@ -1,0 +1,13 @@
+proxy,role,room,height_m,enclosure,metal_or_water_within_0.5m,power,wifi_rssi_dbm,rssi_1m_median_dbm,rssi_1m_spread_db,offset_db,distance_check_1m,date,notes
+golden (choose),,,,,,,,,,0,,,reference proxy for ref_power
+connection proxy - ground,active,family room / kitchen,,,,,,,,,,,
+passive - lounge,passive,lounge,,,,,,,,,,,
+passive - play room,passive,play room,,,,,,,,,,,
+lean - understairs,lean,understairs,,,,,,,,,,,
+lean - utility,lean,utility,,,,,,,,,,,
+connection proxy - 1st,active,bedroom 2,,,,,,,,,,,
+passive - main bedroom,passive,main bedroom,,,,,,,,,,,
+passive - bedroom 3,passive,bedroom 3,,,,,,,,,,,
+passive - office,passive,office,,,,,,,,,,,
+connection proxy - 2nd,active,studio,,,,,,,,,,,after firmware fix
+host adapter,host,,,,,,,,,,,,

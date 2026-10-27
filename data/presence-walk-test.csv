@@ -1,0 +1,12 @@
+test_point,floor,type,expected_area,bermuda_area,correct,settle_time_s,run,date,notes
+lounge centre,ground,centre,lounge,,,,1,,
+lounge / hall doorway,ground,boundary,lounge,,,,1,,
+family room centre,ground,centre,family room,,,,1,,
+play room centre,ground,centre,play room,,,,1,,
+utility centre,ground,centre,utility,,,,1,,
+stair landing,1st,boundary,landing,,,,1,,
+main bedroom centre,1st,centre,main bedroom,,,,1,,
+bedroom 2 centre,1st,centre,bedroom 2,,,,1,,
+bedroom 3 centre,1st,centre,bedroom 3,,,,1,,
+office centre,1st,centre,office,,,,1,,
+studio centre,2nd,centre,studio,,,,1,,

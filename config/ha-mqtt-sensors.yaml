@@ -1,11 +1,18 @@
-# Home Assistant (configuration.yaml): count sensor per scanner board
+# Home Assistant (configuration.yaml): one count + one list sensor per scanner board.
+# Renaming a board: change only the name: lines. Keep unique_id and topics, so the entity
+# and its history carry on.
 mqtt:
   sensor:
-    - name: "BLE devices seen (<board>)"
-      unique_id: ble_devices_seen_board
+    - name: "BLE Devices Seen - <Room>"
+      unique_id: ble_devices_seen_<board>
       state_topic: "ble_scanner/<board>/count"
-      unit_of_measurement: "devices"
-    - name: "BLE device list (<board>)"
-      unique_id: ble_device_list_board
+    - name: "BLE Device List - <Room>"
+      unique_id: ble_device_list_<board>
       state_topic: "ble_scanner/<board>/count"
       json_attributes_topic: "ble_scanner/<board>/all_devices"
+
+# The list sensors carry up to 200 entries as attributes: keep them out of the recorder.
+recorder:
+  exclude:
+    entity_globs:
+      - sensor.ble_device_list*
