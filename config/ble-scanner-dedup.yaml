@@ -1,0 +1,46 @@
+# ESPHome: passive BLE scanner that de-duplicates devices on the ESP32 and publishes
+# a bounded list + count to MQTT every 10 minutes (keeps HA's recorder light).
+# Part of an existing BLE-proxy board; credentials via !secret.
+mqtt:
+  id: mqtt_client
+  broker: !secret mqtt_broker
+  username: !secret mqtt_username
+  password: !secret mqtt_password
+  keepalive: 60s            # 15 s caused disconnect cycling under BLE load
+
+bluetooth_proxy:
+  active: false
+
+globals:
+  - id: seen_devices
+    type: std::vector<std::string>
+    restore_value: no
+
+esp32_ble_tracker:
+  scan_parameters:
+    interval: 320ms
+    window: 30ms
+    active: false           # passive: listen only
+  on_ble_advertise:
+    - then:
+        - lambda: |-
+            std::string mac = x.address_str();
+            auto &v = id(seen_devices);
+            if (std::find(v.begin(), v.end(), mac) == v.end()) {
+              v.push_back(mac);
+              if (v.size() > 200) v.erase(v.begin());   // bounded: prevents the memory crash
+            }
+
+interval:
+  - interval: 10min
+    then:
+      - lambda: |-
+          auto &v = id(seen_devices);
+          std::string json = "{\"devices\":[";
+          for (size_t i = 0; i < v.size(); i++) {
+            if (i) json += ",";
+            json += "\"" + v[i] + "\"";
+          }
+          json += "]}";                                   // dict-wrapped: HA json_attributes needs an object
+          id(mqtt_client).publish("ble_scanner/<board>/all_devices", json, 0, false);
+          id(mqtt_client).publish("ble_scanner/<board>/count", to_string(v.size()), 0, false);

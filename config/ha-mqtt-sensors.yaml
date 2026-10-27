@@ -1,0 +1,11 @@
+# Home Assistant (configuration.yaml): count sensor per scanner board
+mqtt:
+  sensor:
+    - name: "BLE devices seen (<board>)"
+      unique_id: ble_devices_seen_board
+      state_topic: "ble_scanner/<board>/count"
+      unit_of_measurement: "devices"
+    - name: "BLE device list (<board>)"
+      unique_id: ble_device_list_board
+      state_topic: "ble_scanner/<board>/count"
+      json_attributes_topic: "ble_scanner/<board>/all_devices"
