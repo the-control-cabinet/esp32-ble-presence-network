@@ -16,7 +16,7 @@ Connections cost radio time, memory and complexity. Letting every board connect 
 | Ground | Family room / kitchen (interim; moves to the understairs plant board later) | Lounge, play room | Understairs (UFH/cooker monitoring), utility (water metering) |
 | 1st | Bedroom 2 (also hosts a dedicated bridge for a device needing LE Secure Connections pairing) | Main bedroom, bedroom 3, office | |
 | 2nd | Studio | | |
-| n/a | | | Boiler plant board: **no Bluetooth** (fully allocated I/O); camera board: no Bluetooth |
+| n/a | | VPin cabinet board (passive proxy; not yet moved to the fleet profiles) | Boiler plant board: **no Bluetooth** (fully allocated I/O); camera board: no Bluetooth |
 
 Room names are generic in this repo.
 

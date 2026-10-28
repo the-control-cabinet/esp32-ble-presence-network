@@ -1,5 +1,8 @@
 # Changelog
 
+## [2.1.1] - 2026-10-28
+- Fleet table: VPin cabinet board added (11 ESP32 proxies in total).
+
 ## [2.1.0] - 2026-10-27
 - Calibration exercise (planned): survey, global ref_power/attenuation, per-receiver offsets, walk test, acceptance criteria, re-calibration triggers (doc 05); record-sheet templates in data/.
 
