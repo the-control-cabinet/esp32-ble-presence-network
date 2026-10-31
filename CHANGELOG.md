@@ -1,5 +1,8 @@
 # Changelog
 
+## [2.2.0] - 2026-10-31
+- Incident 03: 48-hour uptime comparison, heap analysis (no leak), Nespresso connection churn, crash-capture findings (update-time watchdog vs in-service), Reset Reason sensors, next tests.
+
 ## [2.1.1] - 2026-10-28
 - Fleet table: VPin cabinet board added (11 ESP32 proxies in total).
 
