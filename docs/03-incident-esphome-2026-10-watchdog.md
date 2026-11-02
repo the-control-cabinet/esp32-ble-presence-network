@@ -64,6 +64,15 @@ The same signature (`Task wdt` in `esp_vApplicationIdleHook`, crashed core 1, ES
 
 **Next:** collect the next in-service crash (decoded backtrace) and reset reasons; then run Studio **passive for 24-48 h** to test the active-connection hypothesis; report results upstream.
 
+## Update: 2026.10.1 confirmed failing; fleet on 2026.10.2 (2 Nov 2026)
+
+- **2026.10.1 does not fix it.** After an HA restart on 2 Nov, the Reset Reason sensors showed **"task watchdog"** on **Family Room** and **Studio**: genuine in-service resets (not the update-time watchdog). The 1st-floor board's reset was a legitimate OTA reboot.
+- **Connection churn seen again:** the 1st-floor board's shaver connection was flapping on and off about **every minute**, the same pattern as Family Room's coffee machine. It supports the active-connection hypothesis; the shaver is to be re-paired.
+- **2026.10.2** (released 2 Nov) includes a Bluetooth-proxy fix that **releases held connections when a new client replaces the subscriber** (esphome #22077), which is in the same area. It lists **no fix for #21716**. The whole fleet was updated, with **no YAML changes**, to isolate the effect of the release.
+- **Wi-Fi signal now visible from the router** for every board (the mesh access points became router-managed nodes the same day), so signal can be checked against each reset.
+
+**Next:** compare Reset Reasons after the 2026.10.2 OTA reboots (ignore those) over several days; hold the Studio passive test until then (one change at a time).
+
 ## Lessons
 - **Instrument before guessing.** Adding heap and loop-time sensors ruled out three hypotheses within an hour.
 - **One variable per flash.** Each test changed exactly one thing.

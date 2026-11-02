@@ -1,5 +1,8 @@
 # Changelog
 
+## [2.3.0] - 2026-11-02
+- Incident 03: 2026.10.1 confirmed failing (in-service task-watchdog resets on Family Room and Studio); shaver connection churn; fleet updated to 2026.10.2 (Bluetooth-proxy held-connection fix, no fix for #21716) with no YAML changes; router-side Wi-Fi signal now available per board.
+
 ## [2.2.0] - 2026-10-31
 - Incident 03: 48-hour uptime comparison, heap analysis (no leak), Nespresso connection churn, crash-capture findings (update-time watchdog vs in-service), Reset Reason sensors, next tests.
 
